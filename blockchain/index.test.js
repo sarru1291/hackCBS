@@ -1,4 +1,4 @@
-const Blockchain = require('./blockchain');
+const Blockchain = require('./index');
 const expect = require('chai').expect;
 const Block = require('./block');
 

@@ -1,5 +1,5 @@
 const Block = require('./block'),
-    Blockchain = require('./blockchain');
+    Blockchain = require('./index');
 const expect = require('chai').expect;
 
 describe('Block', () => {
