@@ -6,7 +6,9 @@
   "scripts": {
     "test": "mocha **/*.test.js",
     "dev-test": "nodemon dev-test",
-    "test-watch": "nodemon --exec \"npm test\""
+    "test-watch": "nodemon --exec \"npm test\"",
+    "start": "node ./app",
+    "dev": "nodemon ./app"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +18,8 @@
     "nodemon": "^1.18.4"
   },
   "dependencies": {
-    "express": "^4.16.4"
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "ws": "^6.1.0"
   }
 }
