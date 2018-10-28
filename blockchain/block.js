@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+const ChainUtil = require('../chain-util');
 const {
     DIFFICULTY,
     MINE_RATE
@@ -43,10 +43,7 @@ class Block {
         return new this(timestamp, lastHash, hash, data, nonce, difficulty);
     }
     static hash(timestamp, lastHash, data, nonce, difficulty) {
-        let password = `${timestamp}${lastHash}${data}${nonce}${difficulty}`;
-        let salt = crypto.randomBytes(16).toString('hex');
-        return crypto.pbkdf2Sync(password, salt, 1000, 5, `sha512`).toString('hex');
-
+        return ChainUtil.hash(`${timestamp}${lastHash}${data}${nonce}${difficulty}`);
     }
     static blockHash(block) {
         let {
