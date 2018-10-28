@@ -11,6 +11,9 @@ class TransactionPool {
             this.transactions.push(transaction);
         }
     }
+    existingTransaction(address) {
+        return this.transactions.find(transaction => transaction.input.address === address);
+    }
     validTransactions() {
         return this.transactions.filter(transaction => {
             const outputTotal = transaction.outputs.reduce((total, output) => {
@@ -30,12 +33,10 @@ class TransactionPool {
             return transaction;
         });
     }
-    existingTransaction(address) {
-        return this.transactions.find(transaction => transaction.input.address === address);
-    }
-    clear() {
-        this.transactions = [];
-    }
+
+    // clear() {
+    //     this.transactions = [];
+    // }
 }
 
 module.exports = TransactionPool;
