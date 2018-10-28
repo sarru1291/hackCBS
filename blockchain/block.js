@@ -1,11 +1,16 @@
 const crypto = require('crypto');
-
+const {
+    DIFFICULTY,
+    MINE_RATE
+} = require('../config');
 class Block {
-    constructor(timestamp, lastHash, hash, data) {
+    constructor(timestamp, lastHash, hash, data, nonce, difficulty) {
         this.timestamp = timestamp;
         this.lastHash = lastHash;
         this.hash = hash;
         this.data = data;
+        this.nonce = nonce;
+        this.difficulty = difficulty || DIFFICULTY;
     }
 
     toString() {
@@ -13,20 +18,32 @@ class Block {
         Timestamp: ${this.timestamp}
         Last Hash: ${this.lastHash.substring(0,10)}
         Hash     : ${this.hash.substring(0,10)}
-        data     : ${this.data}`
+        Nonce    : ${this.nonce}
+        Data     : ${this.data}
+        Difficulty: ${this.difficulty}`
     }
     static genesis() {
-        return new this('Genesis time', '-----', 'fir57-h45h', []);
+        return new this('Genesis time', '-----', 'fir57-h45h', [], 0, DIFFICULTY);
     }
     static mineBlock(lastBlock, data) {
-        const timestamp = Date.now();
+        let hash, timestamp;
         const lastHash = lastBlock.hash;
-        const hash = Block.hash(timestamp, lastHash, data);
+        let {
+            difficulty
+        } = lastBlock;
+        let nonce = 0;
 
-        return new this(timestamp, lastHash, hash, data);
+        do {
+            nonce++;
+            timestamp = Date.now();
+            difficulty = Block.adjustDifficulty(lastBlock, timestamp);
+            hash = Block.hash(timestamp, lastHash, data, nonce, difficulty);
+        } while (hash.substring(0, difficulty) !== '0'.repeat(difficulty));
+
+        return new this(timestamp, lastHash, hash, data, nonce, difficulty);
     }
-    static hash(timestamp, lastHash, data) {
-        let password = `${timestamp}${lastHash}${data}`;
+    static hash(timestamp, lastHash, data, nonce, difficulty) {
+        let password = `${timestamp}${lastHash}${data}${nonce}${difficulty}`;
         let salt = crypto.randomBytes(16).toString('hex');
         return crypto.pbkdf2Sync(password, salt, 1000, 5, `sha512`).toString('hex');
 
@@ -35,9 +52,19 @@ class Block {
         let {
             timestamp,
             lastHash,
-            data
+            data,
+            nonce,
+            difficulty
         } = block;
-        return Block.hash(timestamp, lastHash, data);
+        return Block.hash(timestamp, lastHash, data, nonce, difficulty);
+    }
+    static adjustDifficulty(lastBlock, currentTime) {
+        let {
+            difficulty
+        } = lastBlock;
+        difficulty = lastBlock.timestamp + MINE_RATE > currentTime ?
+            difficulty + 1 : difficulty - 1;
+        return difficulty;
     }
 }
 
